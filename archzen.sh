@@ -75,7 +75,7 @@ sudo systemctl daemon-reload
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak install -y flathub com.valvesoftware.Steam org.libretro.RetroArch com.github.tchx84.Flatseal org.gnome.Calculator org.mozilla.firefox org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08 org.videolan.VLC
 
-for app in org.libretro.RetroArch io.github.ryubing.Ryujinx com.valvesoftware.Steam org.videolan.VLC; do
+for app in org.libretro.RetroArch com.valvesoftware.Steam org.videolan.VLC; do
     sudo flatpak override --system "$app" --socket=wayland --socket=x11 --device=dri --share=ipc --device=input
 done
 
