@@ -31,7 +31,7 @@ sudo sysctl --system
 
 sudo tee /etc/systemd/zram-generator.conf >/dev/null <<'EOF'
 [zram0]
-zram-size = ram / 2
+zram-size = ram / 1
 compression-algorithm = zstd
 swap-priority = 100
 fs-type = swap
