@@ -14,7 +14,7 @@ fi
 sudo sed -i -e '/^#\[multilib\]/,+1 s/^#//' -e 's/#Color/Color/' -e '/^Color$/a ILoveCandy' -e 's/^#\?ParallelDownloads.*/ParallelDownloads = 10/' /etc/pacman.conf
 echo -e '--save /etc/pacman.d/mirrorlist\n--protocol https --country "United States,Canada" --latest 12 --sort rate --number 20' | sudo tee /etc/reflector.conf >/dev/null
 
-sudo pacman -Syu --needed --noconfirm plasma-desktop plasma-login-manager konsole dolphin kate nano plasma-pa plasma-nm kscreen htop flatpak partitionmanager ark breeze-gtk spectacle kwalletmanager fuse2 reflector fastfetch rsync tuned tuned-ppd kde-gtk-config ananicy-cpp gwenview git amdgpu_top gamemode pacman-contrib zram-generator openssh make scdoc bats cargo archlinux-contrib glibc libgcc curl fakeroot htmlq diffutils hicolor-icon-theme glib2 xdg-utils util-linux
+sudo pacman -Syu --needed --noconfirm plasma-desktop plasma-login-manager konsole dolphin kate nano plasma-pa plasma-nm kscreen htop flatpak partitionmanager ark breeze-gtk spectacle kwalletmanager fuse2 reflector fastfetch rsync tuned tuned-ppd kde-gtk-config ananicy-cpp gwenview git amdgpu_top gamemode pacman-contrib zram-generator openssh
 
 # 2. Minimal Sysctl, ZRAM & Ananicy Rules
 sudo tee /etc/sysctl.d/99-game-limits.conf >/dev/null <<'EOF'
@@ -62,11 +62,8 @@ start=tuned-adm profile latency-performance
 end=tuned-adm profile desktop
 EOF
 
-# Link systemd-resolved stub configuration to /etc/resolv.conf
-sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-
 sudo usermod -aG gamemode "$(logname)"
-sudo systemctl enable NetworkManager reflector.timer tuned.service tuned-ppd.service plasmalogin.service ananicy-cpp.service systemd-resolved.service
+sudo systemctl enable NetworkManager reflector.timer tuned.service tuned-ppd.service plasmalogin.service ananicy-cpp.service
 sudo systemctl start tuned.service tuned-ppd.service || true
 sudo tuned-adm profile desktop || true
 sudo systemctl daemon-reload
