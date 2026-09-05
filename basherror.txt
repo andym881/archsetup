@@ -1,0 +1,5 @@
+USB Mount Permission Note
+
+If running ./archzengit.sh gives a Permission denied error, your USB partition (FAT32/exFAT) may be mounted with the noexec flag. You can run the script using bash directly without changing mount settings:
+
+bash /run/media/srx/Ventoy/archzengit.sh
