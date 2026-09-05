@@ -3,8 +3,8 @@ set -euo pipefail
 echo "--- Starting Clean Arch Linux-Zen Setup ---"
 
 _user_home="/home/$(logname)"
-# Find archzen-config relative to the script's location
-_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Find archzen-config relative to the script's location with pipe safety
+_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || pwd)"
 _archive_dir="$_script_dir/archzen-config"
 
 # 1. Sudoers Temp Access & Pacman Setup
@@ -45,7 +45,10 @@ sudo cp -r "$_tmp_ananicy/ananicy-rules/." /etc/ananicy.d/
 rm -rf "$_tmp_ananicy"
 
 # 5. Service & Group Configuration
+sudo groupadd -f audio
+sudo groupadd -f gamemode
 sudo usermod -aG audio,gamemode "$(logname)"
+
 sudo systemctl enable NetworkManager reflector.timer tuned.service tuned-ppd.service plasmalogin.service ananicy-cpp.service
 sudo systemctl start tuned.service tuned-ppd.service || true
 sudo tuned-adm profile desktop || true
