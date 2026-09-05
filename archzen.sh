@@ -28,6 +28,11 @@ if [ -d "$_archive_dir/etc" ]; then
     sudo modprobe ntsync || true
 fi
 
+if [ -d "$_archive_dir/usr" ]; then
+    echo "--> Syncing system shared resources to /usr..."
+    sudo rsync -av "$_archive_dir/usr/" /usr/
+fi
+
 if [ -d "$_archive_dir/user-config" ]; then
     echo "--> Syncing user configuration files..."
     mkdir -p "$_user_home/.config/environment.d"
