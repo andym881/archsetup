@@ -3,8 +3,9 @@ set -euo pipefail
 echo "--- Starting Clean Arch Linux-Zen Setup ---"
 
 _user_home="/home/$(logname)"
-_repo_url="https://github.com/andym881/archsetup.git"
-_tmp_repo=$(mktemp -d)
+# Find archzen-config relative to the script's location
+_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_archive_dir="$_script_dir/archzen-config"
 
 # 1. Sudoers Temp Access & Pacman Setup
 if [ ! -f /etc/sudoers.d/10-wheel-nopasswd ]; then
@@ -18,12 +19,7 @@ echo -e '--save /etc/pacman.d/mirrorlist\n--protocol https --country "United Sta
 # 2. Base Tooling & Package Installation
 sudo pacman -Syu --needed --noconfirm git plasma-desktop plasma-login-manager konsole dolphin kate nano plasma-pa plasma-nm kscreen htop flatpak partitionmanager ark breeze-gtk spectacle kwalletmanager fuse2 reflector fastfetch rsync tuned tuned-ppd kde-gtk-config ananicy-cpp gwenview amdgpu_top gamemode pacman-contrib zram-generator openssh
 
-# 3. Clone Remote Configurations Repository
-echo "--> Cloning archsetup repository..."
-git clone --depth=1 "$_repo_url" "$_tmp_repo/archsetup"
-_archive_dir="$_tmp_repo/archsetup/archzen-config"
-
-# 4. Deploy System & User Configurations
+# 3. Deploy System & User Configurations
 if [ -d "$_archive_dir/etc" ]; then
     echo "--> Syncing system configuration files to /etc..."
     sudo rsync -av "$_archive_dir/etc/" /etc/
@@ -40,10 +36,7 @@ if [ -d "$_archive_dir/user-config" ]; then
     chown -R "$(logname):$(logname)" "$_user_home/.config"
 fi
 
-# Clean up temp repository
-rm -rf "$_tmp_repo"
-
-# 5. Fetch CachyOS Ananicy Rules
+# 4. Fetch CachyOS Ananicy Rules
 _tmp_ananicy=$(mktemp -d)
 git clone --depth=1 https://github.com/CachyOS/ananicy-rules.git "$_tmp_ananicy/ananicy-rules"
 sudo mkdir -p /etc/ananicy.d
@@ -51,14 +44,14 @@ sudo cp -r "$_tmp_ananicy/ananicy-rules/." /etc/ananicy.d/
 [ -f /etc/ananicy.d/ananicy.conf ] && sudo sed -i 's/^#\?ignore_kernel_threads.*/ignore_kernel_threads=true/' /etc/ananicy.d/ananicy.conf
 rm -rf "$_tmp_ananicy"
 
-# 6. Service & Group Configuration
+# 5. Service & Group Configuration
 sudo usermod -aG audio,gamemode "$(logname)"
 sudo systemctl enable NetworkManager reflector.timer tuned.service tuned-ppd.service plasmalogin.service ananicy-cpp.service
 sudo systemctl start tuned.service tuned-ppd.service || true
 sudo tuned-adm profile desktop || true
 sudo systemctl daemon-reload
 
-# 7. Flatpak Provisioning & Overrides
+# 6. Flatpak Provisioning & Overrides
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak install -y flathub com.valvesoftware.Steam org.libretro.RetroArch com.github.tchx84.Flatseal org.gnome.Calculator org.mozilla.firefox org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08 org.videolan.VLC
 
